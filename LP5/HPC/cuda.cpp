@@ -207,3 +207,80 @@ int main() {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+//2 nd code with no speedup things
+/*
+#include <iostream>
+#include <cuda.h>
+using namespace std;
+
+#define N 512  // Size for both vector and square matrix
+
+// Vector addition kernel
+_global_ void vectorAdd(float *a, float *b, float *c, int n) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n) c[i] = a[i] + b[i];
+}
+
+// Matrix multiplication kernel
+_global_ void matMul(float *A, float *B, float *C, int n) {
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row < n && col < n) {
+        float sum = 0;
+        for (int k = 0; k < n; ++k)
+            sum += A[row * n + k] * B[k * n + col];
+        C[row * n + col] = sum;
+    }
+}
+
+int main() {
+    // ---------- Vector Addition ----------
+    int sizeVec = N * sizeof(float);
+    float *a, *b, *c, *d_a, *d_b, *d_c;
+    a = new float[N]; b = new float[N]; c = new float[N];
+    cudaMalloc(&d_a, sizeVec); cudaMalloc(&d_b, sizeVec); cudaMalloc(&d_c, sizeVec);
+
+    for (int i = 0; i < N; i++) { a[i] = i; b[i] = 2 * i; }
+
+    cudaMemcpy(d_a, a, sizeVec, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b, sizeVec, cudaMemcpyHostToDevice);
+    vectorAdd<<<(N + 255) / 256, 256>>>(d_a, d_b, d_c, N);
+    cudaMemcpy(c, d_c, sizeVec, cudaMemcpyDeviceToHost);
+
+    cout << "Vector Add: c[0] = " << c[0] << ", c[N-1] = " << c[N - 1] << endl;
+
+    // ---------- Matrix Multiplication ----------
+    int sizeMat = N * N * sizeof(float);
+    float *A, *B, *C, *d_A, *d_B, *d_C;
+    A = new float[N * N]; B = new float[N * N]; C = new float[N * N];
+    cudaMalloc(&d_A, sizeMat); cudaMalloc(&d_B, sizeMat); cudaMalloc(&d_C, sizeMat);
+
+    for (int i = 0; i < N * N; i++) { A[i] = 1.0f; B[i] = 2.0f; }
+
+    cudaMemcpy(d_A, A, sizeMat, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, B, sizeMat, cudaMemcpyHostToDevice);
+
+    dim3 threads(16, 16);
+    dim3 blocks(N / threads.x, N / threads.y);
+    matMul<<<blocks, threads>>>(d_A, d_B, d_C, N);
+    cudaMemcpy(C, d_C, sizeMat, cudaMemcpyDeviceToHost);
+
+    cout << "Matrix Mul: C[0][0] = " << C[0] << ", C[N-1][N-1] = " << C[N * N - 1] << endl;
+
+    // Cleanup
+    delete[] a; delete[] b; delete[] c;
+    delete[] A; delete[] B; delete[] C;
+    cudaFree(d_a); cudaFree(d_b); cudaFree(d_c);
+    cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
+
+    return 0;
+}
+*/
