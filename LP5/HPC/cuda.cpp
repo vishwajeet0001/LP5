@@ -242,17 +242,17 @@ _global_ void matMul(float *A, float *B, float *C, int n) {
 }
 
 int main() {
-    // ---------- Vector Addition ----------
-    int sizeVec = N * sizeof(float);
-    float *a, *b, *c, *d_a, *d_b, *d_c;
+    // ---------- Vector Addition ----------      memory allocate krna h CPU and GPU pe
+    int sizeVec = N * sizeof(float);              Calculates total size in bytes for one vector of N elements-> yeah device ke allocation ke liye kr rhe h
+    float *a, *b, *c, *d_a, *d_b, *d_c;           3-3 pointer host or device ke liye HOST->cpu and device is gpu
     a = new float[N]; b = new float[N]; c = new float[N];
     cudaMalloc(&d_a, sizeVec); cudaMalloc(&d_b, sizeVec); cudaMalloc(&d_c, sizeVec);
 
-    for (int i = 0; i < N; i++) { a[i] = i; b[i] = 2 * i; }
+    for (int i = 0; i < N; i++) { a[i] = i; b[i] = 2 * i; }      input le rhe h a or b me
 
-    cudaMemcpy(d_a, a, sizeVec, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_a, a, sizeVec, cudaMemcpyHostToDevice);       ------copy data from the CPU (host) to the GPU (device) before kernel execution------
     cudaMemcpy(d_b, b, sizeVec, cudaMemcpyHostToDevice);
-    vectorAdd<<<(N + 255) / 256, 256>>>(d_a, d_b, d_c, N);
+    vectorAdd<<<(N + 255) / 256, 256>>>(d_a, d_b, d_c, N);   --vectorAdd<<<blocks, threads>>>---,, aur kernel me GPU memory pointers are passed
     cudaMemcpy(c, d_c, sizeVec, cudaMemcpyDeviceToHost);
 
     cout << "Vector Add: c[0] = " << c[0] << ", c[N-1] = " << c[N - 1] << endl;
@@ -268,8 +268,8 @@ int main() {
     cudaMemcpy(d_A, A, sizeMat, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, B, sizeMat, cudaMemcpyHostToDevice);
 
-    dim3 threads(16, 16);
-    dim3 blocks(N / threads.x, N / threads.y);
+    dim3 threads(16, 16);           //Each block has 16 × 16 = 256 threads.
+    dim3 blocks(N / threads.x, N / threads.y);   //threads.x==>16
     matMul<<<blocks, threads>>>(d_A, d_B, d_C, N);
     cudaMemcpy(C, d_C, sizeMat, cudaMemcpyDeviceToHost);
 
