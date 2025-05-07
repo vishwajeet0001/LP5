@@ -1,14 +1,15 @@
-#include <iostream>
-#include <omp.h>
-#include <vector>
-#include <climits>
-#include <cstdlib>
-#include <chrono>
+#include <iostream>       // For input/output
+#include <omp.h>          // For OpenMP parallel programming
+#include <vector>         // For using dynamic arrays
+#include <climits>        // For INT_MAX and INT_MIN
+#include <cstdlib>        // For rand()
+#include <chrono>         // For measuring time
+
 
 using namespace std;
 using namespace std::chrono;
 
-void generateArray(vector<int> &arr, int n)
+void generateArray(vector<int> &arr, int n)        ///// #1 generate array-> of size taken from int main()
 {
     for (int &num : arr)
     {
@@ -115,11 +116,10 @@ int main()
 {
     omp_set_num_threads(4);
 
-    int n;
+    int n;                                                      
     cout << "Enter the number of elements in the array: ";
     cin >> n;
     vector<int> arr(n);
-
     generateArray(arr, n);
 
     cout << "\nArray elements are: ";
