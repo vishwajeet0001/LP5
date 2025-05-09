@@ -6,7 +6,7 @@
 using namespace std;
 
 // Vector Addition Kernel
-_global_ void vectorAdd(int *d_a, int *d_b, int *d_c, int n) {
+__global__ void vectorAdd(int *d_a, int *d_b, int *d_c, int n) {
     int i = threadIdx.x + blockIdx.x * blockDim.x;
     if (i < n) {
         d_c[i] = d_a[i] + d_b[i];
@@ -14,7 +14,7 @@ _global_ void vectorAdd(int *d_a, int *d_b, int *d_c, int n) {
 }
 
 // Matrix Multiplication Kernel
-_global_ void matrixMultiplyKernel(float *a, float *b, float *c, int N) {
+__global__ void matrixMultiplyKernel(float *a, float *b, float *c, int N) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     if (row < N && col < N) {
